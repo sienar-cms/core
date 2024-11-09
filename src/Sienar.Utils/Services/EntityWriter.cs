@@ -35,7 +35,7 @@ public class EntityWriter<TEntity> : IEntityWriter<TEntity>
 		_afterHooks = afterHooks;
 	}
 
-	public async Task<OperationResult<Guid>> Create(TEntity model)
+	public async Task<OperationResult<Guid?>> Create(TEntity model)
 	{
 		// Run access validation
 		var accessValidationResult = await _accessValidator.Validate(model, ActionType.Create);
