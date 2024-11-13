@@ -29,7 +29,8 @@ public class Rest : IWebPlugin
 	public void SetupDependencies(WebApplicationBuilder builder)
 	{
 		builder.Services
-			.AddControllers()
+			.AddAntiforgery(o => o.HeaderName = "X-XSRF-TOKEN")
+			.AddControllersWithViews(o => o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
 			.ConfigureApiBehaviorOptions(o =>
 			{
 				o.InvalidModelStateResponseFactory = context =>
@@ -60,6 +61,7 @@ public class Rest : IWebPlugin
 		builder.Services.AddSwaggerGen();
 
 		builder.Services
+			.AddScoped<ICsrfTokenRefresher, CsrfTokenRefresher>()
 			.AddScoped<IReadableNotificationService, RestNotificationService>()
 			.AddScoped<INotificationService>(
 				sp => sp.GetRequiredService<IReadableNotificationService>())
@@ -74,6 +76,8 @@ public class Rest : IWebPlugin
 			app.UseSwagger();
 			app.UseSwaggerUI();
 		}
+
+		app.UseMiddleware<CsrfMiddleware>();
 
 		app.MapControllers();
 	}
