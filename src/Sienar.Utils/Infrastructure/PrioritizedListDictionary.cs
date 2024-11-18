@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Sienar.Infrastructure;
 
@@ -37,4 +38,20 @@ public class PrioritizedListDictionary<T> : Dictionary<Priority, List<T>>
 	public PrioritizedListDictionary<T> AddWithNormalPriority(
 		params T[] prioritizedItems)
 		=> AddWithPriority(Priority.Normal, prioritizedItems);
+
+	/// <summary>
+	/// Aggregates the prioritized items into a single ordered list arranged by priority
+	/// </summary>
+	/// <returns>The prioritized items in an ordered list</returns>
+	public List<T> AggregatePrioritized()
+	{
+		var ordered = new List<T>();
+
+		foreach (var i in Keys.OrderDescending())
+		{
+			ordered.AddRange(this[i]);
+		}
+
+		return ordered;
+	}
 }
