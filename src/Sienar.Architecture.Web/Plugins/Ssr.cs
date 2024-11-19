@@ -32,10 +32,15 @@ public class Ssr : IWebPlugin
 	}
 
 	/// <inheritdoc />
-	public void SetupApp(WebApplication app)
+	public void SetupApp(MiddlewareProvider provider)
 	{
-		app.MapControllerRoute(
-			name: "default",
-			pattern: "{controller=Home}/{action=Index}/{id?}");
+		provider.AddWithPriority(
+			Priority.Lowest,
+			app =>
+			{
+				app.MapControllerRoute(
+					name: "default",
+					pattern: "{controller=Home}/{action=Index}/{id?}");
+			});
 	}
 }

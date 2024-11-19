@@ -1,7 +1,6 @@
 ﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sienar.Infrastructure;
@@ -24,15 +23,8 @@ public class AuthorizedLinkAggregator<TLink> : IAuthorizedLinkAggregator<TLink>
 	/// <inheritdoc />
 	public Task<List<TLink>> Create(string name)
 	{
-		var orderedLinks = new List<TLink>();
 		var linkDictionary = _provider.Access(name);
-
-		foreach (var i in linkDictionary.Keys.OrderDescending())
-		{
-			orderedLinks.AddRange(linkDictionary[i]);
-		}
-
-		return ProcessNavLinks(orderedLinks);
+		return ProcessNavLinks(linkDictionary.AggregatePrioritized());
 	}
 
 	protected async Task<List<TLink>> ProcessNavLinks(List<TLink> navLinks)

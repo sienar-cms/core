@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Sienar.Extensions;
 using Sienar.Plugins;
 
@@ -22,11 +21,6 @@ public sealed class SienarWebAppBuilder
 	public readonly WebApplicationBuilder Builder;
 
 	/// <summary>
-	/// A list of middlewares to be applied to the app
-	/// </summary>
-	public readonly List<Action<WebApplication>> Middlewares = [];
-
-	/// <summary>
 	/// A dictionary that contains custom values that can be used by non-Sienar code during the application initialization process
 	/// </summary>
 	public readonly Dictionary<string, object> CustomItems = new();
@@ -35,6 +29,11 @@ public sealed class SienarWebAppBuilder
 	/// The plugin data provider added to the DI container
 	/// </summary>
 	public readonly IPluginDataProvider PluginDataProvider;
+
+	/// <summary>
+	/// The middlewares that should be executed at startup, arranged by priority
+	/// </summary>
+	public readonly MiddlewareProvider MiddlewareProvider = new();
 
 	/// <summary>
 	/// The startup args as provided to <c>public static void Main(string[] args)</c>
@@ -79,7 +78,7 @@ public sealed class SienarWebAppBuilder
 	public SienarWebAppBuilder AddPlugin(IWebPlugin plugin)
 	{
 		plugin.SetupDependencies(Builder);
-		Middlewares.Add(plugin.SetupApp);
+		plugin.SetupApp(MiddlewareProvider);
 		PluginDataProvider.Add(plugin.PluginData);
 		return this;
 	}
@@ -100,9 +99,9 @@ public sealed class SienarWebAppBuilder
 	/// </summary>
 	/// <param name="configurer">an <see cref="Action{WebApplication}"/> that accepts the <see cref="WebApplication"/> as its only argument</param>
 	/// <returns>the Sienar app builder</returns>
-	public SienarWebAppBuilder SetupApp(Action<WebApplication> configurer)
+	public SienarWebAppBuilder SetupApp(Action<MiddlewareProvider> configurer)
 	{
-		Middlewares.Add(configurer);
+		configurer(MiddlewareProvider);
 		return this;
 	}
 
@@ -143,48 +142,61 @@ public sealed class SienarWebAppBuilder
 		}
 
 		// Build the app
-		var app = Builder.Build();
+		var dotnetApp = Builder.Build();
 
 		// Set up middlewares
-		if (!app.Environment.IsDevelopment())
-		{
-			app
-				.UseExceptionHandler("/Error")
-				.UseHsts();
-		}
-
-		app.UseStaticFiles();
-
-		if (usesCors)
-		{
-			var corsMiddlewareConfigurer = app.Services.GetService<IConfigurer<CorsPolicyBuilder>>();
-			if (corsMiddlewareConfigurer is not null)
+		MiddlewareProvider.AddWithPriority(
+			Priority.Highest,
+			app =>
 			{
-				app.UseCors(o => corsMiddlewareConfigurer.Configure(o, app.Configuration));
-			}
-			else
+				app.UseStaticFiles();
+			});
+
+		MiddlewareProvider.AddWithPriority(
+			Priority.High,
+			app =>
 			{
-				app.UseCors();
-			}
-		}
+				if (usesCors)
+				{
+					var corsMiddlewareConfigurer = app.Services.GetService<IConfigurer<CorsPolicyBuilder>>();
+					if (corsMiddlewareConfigurer is not null)
+					{
+						app.UseCors(o => corsMiddlewareConfigurer.Configure(o, app.Configuration));
+					}
+					else
+					{
+						app.UseCors();
+					}
+				}
+			});
 
-		app.UseRouting();
+		MiddlewareProvider.AddWithPriority(
+			Priority.Normal,
+			app =>
+			{
+				app.UseRouting();
+			});
 
-		if (usesAuthentication)
+		MiddlewareProvider.AddWithPriority(
+			Priority.Low,
+			app =>
+			{
+				if (usesAuthentication)
+				{
+					app.UseAuthentication();
+				}
+
+				if (usesAuthorization)
+				{
+					app.UseAuthorization();
+				}
+			});
+
+		foreach (var middleware in MiddlewareProvider.AggregatePrioritized())
 		{
-			app.UseAuthentication();
+			middleware(dotnetApp);
 		}
 
-		if (usesAuthorization)
-		{
-			app.UseAuthorization();
-		}
-
-		foreach (var middleware in Middlewares)
-		{
-			middleware(app);
-		}
-
-		return app;
+		return dotnetApp;
 	}
 }

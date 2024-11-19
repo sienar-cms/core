@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Sienar.Infrastructure;
 
 namespace Sienar.Plugins;
 
@@ -21,6 +22,6 @@ public interface IWebPlugin
 	/// <summary>
 	/// Performs operations against the application's <see cref="WebApplication"/>
 	/// </summary>
-	/// <param name="app">the application's underlying <see cref="WebApplication"/></param>
-	void SetupApp(WebApplication app) {}
+	/// <param name="middlewareProvider">a prioritized dictionary of middlewares</param>
+	void SetupApp(MiddlewareProvider middlewareProvider) {}
 }
