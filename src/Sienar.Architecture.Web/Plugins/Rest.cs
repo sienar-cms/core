@@ -69,16 +69,25 @@ public class Rest : IWebPlugin
 	}
 
 	/// <inheritdoc />
-	public void SetupApp(WebApplication app)
+	public void SetupApp(MiddlewareProvider provider)
 	{
-		if (app.Environment.IsDevelopment())
-		{
-			app.UseSwagger();
-			app.UseSwaggerUI();
-		}
+		provider.AddWithPriority(
+			Priority.High,
+			app =>
+			{
+				if (app.Environment.IsDevelopment())
+				{
+					app.UseSwagger();
+					app.UseSwaggerUI();
+				}
+			});
 
-		app.UseMiddleware<CsrfMiddleware>();
+		provider.AddWithPriority(
+			Priority.Normal,
+			app => app.UseMiddleware<CsrfMiddleware>());
 
-		app.MapControllers();
+		provider.AddWithPriority(
+			Priority.Lowest,
+			app => app.MapControllers());
 	}
 }
