@@ -57,15 +57,6 @@ public class Rest : IWebPlugin
 			{
 				o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
 			});
-		builder.Services.AddEndpointsApiExplorer();
-		builder.Services.AddSwaggerGen();
-
-		builder.Services
-			.AddScoped<ICsrfTokenRefresher, CsrfTokenRefresher>()
-			.AddScoped<IReadableNotificationService, RestNotificationService>()
-			.AddScoped<INotificationService>(
-				sp => sp.GetRequiredService<IReadableNotificationService>())
-			.AddScoped<IOperationResultMapper, OperationResultMapper>();
 	}
 
 	/// <inheritdoc />

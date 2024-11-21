@@ -56,7 +56,15 @@ public sealed class SienarWebAppBuilder
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
-		builder.Services.AddSienarCoreUtilities();
+		builder.Services
+			.AddSienarCoreUtilities()
+			.AddEndpointsApiExplorer()
+			.AddSwaggerGen()
+			.AddScoped<ICsrfTokenRefresher, CsrfTokenRefresher>()
+			.AddScoped<IReadableNotificationService, RestNotificationService>()
+			.AddScoped<INotificationService>(
+				sp => sp.GetRequiredService<IReadableNotificationService>())
+			.AddScoped<IOperationResultMapper, OperationResultMapper>();
 
 		return new SienarWebAppBuilder(builder) { StartupArgs = args };
 	}
