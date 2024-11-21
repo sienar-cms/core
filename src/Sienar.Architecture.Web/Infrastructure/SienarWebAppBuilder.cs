@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -139,6 +140,15 @@ public sealed class SienarWebAppBuilder
 			usesAuthentication = true;
 			var authBuilder = Builder.Services.AddAuthentication(o => authenticationConfigurer.Configure(o, Builder.Configuration));
 			authenticationOptionsConfigurer?.Configure(authBuilder, Builder.Configuration);
+		}
+
+		var antiforgeryConfigurer = Builder.Services.GetService<IConfigurer<AntiforgeryOptions>>();
+		if (antiforgeryConfigurer is not null)
+		{
+			Builder.Services.AddAntiforgery(
+				o => antiforgeryConfigurer.Configure(
+					o,
+					Builder.Configuration));
 		}
 
 		// Configure CORS

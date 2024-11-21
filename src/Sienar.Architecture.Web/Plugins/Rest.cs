@@ -29,7 +29,6 @@ public class Rest : IWebPlugin
 	public void SetupDependencies(WebApplicationBuilder builder)
 	{
 		builder.Services
-			.AddAntiforgery(o => o.HeaderName = "X-XSRF-TOKEN")
 			.AddControllersWithViews(o => o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
 			.ConfigureApiBehaviorOptions(o =>
 			{
