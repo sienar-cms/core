@@ -37,6 +37,11 @@ public sealed class SienarWebAppBuilder
 	public readonly MiddlewareProvider MiddlewareProvider = new();
 
 	/// <summary>
+	/// Services that are only used at application startup for configuration by Sienar
+	/// </summary>
+	public readonly IServiceCollection StartupServices = new ServiceCollection();
+
+	/// <summary>
 	/// The startup args as provided to <c>public static void Main(string[] args)</c>
 	/// </summary>
 	public string[] StartupArgs = Array.Empty<string>();
@@ -86,6 +91,7 @@ public sealed class SienarWebAppBuilder
 	/// <returns>the Sienar app builder</returns>
 	public SienarWebAppBuilder AddPlugin(IWebPlugin plugin)
 	{
+		plugin.SetupStartupDependencies(StartupServices);
 		plugin.SetupDependencies(Builder);
 		plugin.SetupApp(MiddlewareProvider);
 		PluginDataProvider.Add(plugin.PluginData);
@@ -100,6 +106,17 @@ public sealed class SienarWebAppBuilder
 	public SienarWebAppBuilder SetupDependencies(Action<WebApplicationBuilder> configurer)
 	{
 		configurer(Builder);
+		return this;
+	}
+
+	/// <summary>
+	/// Used to register services with the startup DI container
+	/// </summary>
+	/// <param name="configurer">an <see cref="Action{IServiceCollection}"/> that accepts the <see cref="IServiceCollection"/> as its only argument</param>
+	/// <returns>the Sienar app builder</returns>
+	public SienarWebAppBuilder SetupStartupDependencies(Action<IServiceCollection> configurer)
+	{
+		configurer(StartupServices);
 		return this;
 	}
 
@@ -120,14 +137,18 @@ public sealed class SienarWebAppBuilder
 	/// <returns>the new <see cref="WebApplication"/></returns>
 	public WebApplication Build()
 	{
+		var container = StartupServices.BuildServiceProvider();
+		using var scope = container.CreateScope();
+		var startupServiceProvider = scope.ServiceProvider;
+
 		var usesAuthorization = false;
 		var usesAuthentication = false;
 		var usesCors = false;
 
 		// Configure auth
-		var authorizationConfigurer = Builder.Services.GetService<IConfigurer<AuthorizationOptions>>();
-		var authenticationConfigurer = Builder.Services.GetService<IConfigurer<AuthenticationOptions>>();
-		var authenticationOptionsConfigurer = Builder.Services.GetService<IConfigurer<AuthenticationBuilder>>();
+		var authorizationConfigurer = startupServiceProvider.GetService<IConfigurer<AuthorizationOptions>>();
+		var authenticationConfigurer = startupServiceProvider.GetService<IConfigurer<AuthenticationOptions>>();
+		var authenticationOptionsConfigurer = startupServiceProvider.GetService<IConfigurer<AuthenticationBuilder>>();
 
 		if (authorizationConfigurer is not null)
 		{
@@ -142,7 +163,7 @@ public sealed class SienarWebAppBuilder
 			authenticationOptionsConfigurer?.Configure(authBuilder, Builder.Configuration);
 		}
 
-		var antiforgeryConfigurer = Builder.Services.GetService<IConfigurer<AntiforgeryOptions>>();
+		var antiforgeryConfigurer = startupServiceProvider.GetService<IConfigurer<AntiforgeryOptions>>();
 		if (antiforgeryConfigurer is not null)
 		{
 			Builder.Services.AddAntiforgery(
@@ -152,7 +173,7 @@ public sealed class SienarWebAppBuilder
 		}
 
 		// Configure CORS
-		var corsConfigurer = Builder.Services.GetService<IConfigurer<CorsOptions>>();
+		var corsConfigurer = startupServiceProvider.GetService<IConfigurer<CorsOptions>>();
 		if (corsConfigurer is not null)
 		{
 			usesCors = true;
@@ -176,7 +197,7 @@ public sealed class SienarWebAppBuilder
 			{
 				if (usesCors)
 				{
-					var corsMiddlewareConfigurer = app.Services.GetService<IConfigurer<CorsPolicyBuilder>>();
+					var corsMiddlewareConfigurer = startupServiceProvider.GetService<IConfigurer<CorsPolicyBuilder>>();
 					if (corsMiddlewareConfigurer is not null)
 					{
 						app.UseCors(o => corsMiddlewareConfigurer.Configure(o, app.Configuration));
