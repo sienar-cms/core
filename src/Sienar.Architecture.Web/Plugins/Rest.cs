@@ -29,7 +29,6 @@ public class Rest : IWebPlugin
 	public void SetupDependencies(WebApplicationBuilder builder)
 	{
 		builder.Services
-			.AddAntiforgery(o => o.HeaderName = "X-XSRF-TOKEN")
 			.AddControllersWithViews(o => o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
 			.ConfigureApiBehaviorOptions(o =>
 			{
@@ -57,15 +56,6 @@ public class Rest : IWebPlugin
 			{
 				o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
 			});
-		builder.Services.AddEndpointsApiExplorer();
-		builder.Services.AddSwaggerGen();
-
-		builder.Services
-			.AddScoped<ICsrfTokenRefresher, CsrfTokenRefresher>()
-			.AddScoped<IReadableNotificationService, RestNotificationService>()
-			.AddScoped<INotificationService>(
-				sp => sp.GetRequiredService<IReadableNotificationService>())
-			.AddScoped<IOperationResultMapper, OperationResultMapper>();
 	}
 
 	/// <inheritdoc />

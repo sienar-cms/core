@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Sienar.Infrastructure;
 
 namespace Sienar.Plugins;
@@ -18,6 +19,12 @@ public interface IWebPlugin
 	/// </summary>
 	/// <param name="builder">the application's underlying <see cref="WebApplicationBuilder"/></param>
 	void SetupDependencies(WebApplicationBuilder builder) {}
+
+	/// <summary>
+	/// Registers services in the application's startup DI container
+	/// </summary>
+	/// <param name="services">the service collection</param>
+	void SetupStartupDependencies(IServiceCollection services) {}
 
 	/// <summary>
 	/// Performs operations against the application's <see cref="WebApplication"/>
