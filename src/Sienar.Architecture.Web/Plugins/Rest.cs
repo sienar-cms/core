@@ -24,27 +24,4 @@ public class Rest : IWebPlugin
 		Homepage = "https://sienar.levesque.dev",
 		Version = Version.Parse("0.1.0")
 	};
-
-	/// <inheritdoc />
-	public void SetupApp(MiddlewareProvider provider)
-	{
-		provider.AddWithPriority(
-			Priority.High,
-			app =>
-			{
-				if (app.Environment.IsDevelopment())
-				{
-					app.UseSwagger();
-					app.UseSwaggerUI();
-				}
-			});
-
-		provider.AddWithPriority(
-			Priority.Normal,
-			app => app.UseMiddleware<CsrfMiddleware>());
-
-		provider.AddWithPriority(
-			Priority.Lowest,
-			app => app.MapControllers());
-	}
 }

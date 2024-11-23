@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Sienar.Extensions;
 using Sienar.Plugins;
 
@@ -214,6 +215,13 @@ public sealed class SienarWebAppBuilder
 			Priority.High,
 			app =>
 			{
+				if (app.Environment.IsDevelopment())
+				{
+					app
+						.UseSwagger()
+						.UseSwaggerUI();
+				}
+
 				if (usesCors)
 				{
 					var corsMiddlewareConfigurer = startupServiceProvider.GetService<IConfigurer<CorsPolicyBuilder>>();
@@ -232,7 +240,9 @@ public sealed class SienarWebAppBuilder
 			Priority.Normal,
 			app =>
 			{
-				app.UseRouting();
+				app
+					.UseMiddleware<CsrfMiddleware>()
+					.UseRouting();
 			});
 
 		MiddlewareProvider.AddWithPriority(
@@ -249,6 +259,10 @@ public sealed class SienarWebAppBuilder
 					app.UseAuthorization();
 				}
 			});
+
+		MiddlewareProvider.AddWithPriority(
+			Priority.Lowest,
+			app => app.MapControllers());
 
 		foreach (var middleware in MiddlewareProvider.AggregatePrioritized())
 		{
