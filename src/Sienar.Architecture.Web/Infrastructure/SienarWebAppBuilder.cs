@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Sienar.Extensions;
 using Sienar.Plugins;
@@ -163,6 +164,7 @@ public sealed class SienarWebAppBuilder
 			authenticationOptionsConfigurer?.Configure(authBuilder, Builder.Configuration);
 		}
 
+		// Configure antiforgery
 		var antiforgeryConfigurer = startupServiceProvider.GetService<IConfigurer<AntiforgeryOptions>>();
 		if (antiforgeryConfigurer is not null)
 		{
@@ -170,6 +172,23 @@ public sealed class SienarWebAppBuilder
 				o => antiforgeryConfigurer.Configure(
 					o,
 					Builder.Configuration));
+		}
+
+		// Configure MVC
+		var mvcConfigurer = startupServiceProvider.GetService<IConfigurer<MvcOptions>>();
+		var additionalMvcConfigurers = startupServiceProvider.GetServices<IConfigurer<IMvcBuilder>>();
+
+		if (mvcConfigurer is not null)
+		{
+			var mvcBuilder = Builder.Services.AddControllersWithViews(
+				o => mvcConfigurer.Configure(
+					o,
+					Builder.Configuration));
+
+			foreach (var configurer in additionalMvcConfigurers)
+			{
+				configurer.Configure(mvcBuilder, Builder.Configuration);
+			}
 		}
 
 		// Configure CORS

@@ -26,39 +26,6 @@ public class Rest : IWebPlugin
 	};
 
 	/// <inheritdoc />
-	public void SetupDependencies(WebApplicationBuilder builder)
-	{
-		builder.Services
-			.AddControllersWithViews(o => o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
-			.ConfigureApiBehaviorOptions(o =>
-			{
-				o.InvalidModelStateResponseFactory = context =>
-				{
-					var details = new ValidationProblemDetails(context.ModelState)
-					{
-						Extensions =
-						{
-							["traceId"] = context.HttpContext.TraceIdentifier
-						}
-					};
-
-					return new UnprocessableEntityObjectResult(details)
-					{
-						ContentTypes =
-						{
-							MediaTypeNames.Application.Json,
-							MediaTypeNames.Application.Xml
-						}
-					};
-				};
-			})
-			.AddJsonOptions(o =>
-			{
-				o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-			});
-	}
-
-	/// <inheritdoc />
 	public void SetupApp(MiddlewareProvider provider)
 	{
 		provider.AddWithPriority(
