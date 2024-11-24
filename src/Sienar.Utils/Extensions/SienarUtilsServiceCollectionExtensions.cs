@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,15 +70,47 @@ public static class SienarUtilsServiceCollectionExtensions
 	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c>
 	/// </summary>
 	/// <param name="self">the service collection</param>
-	/// <param name="configurer">An instance of the configurer</param>
+	/// <typeparam name="TConfigurer">the type of the configurer</typeparam>
 	/// <typeparam name="TOptions">the type of the options class to configure</typeparam>
 	/// <returns>the service collection</returns>
-	public static IServiceCollection AddConfiguration<TOptions>(
-		this IServiceCollection self,
-		IConfigurer<TOptions> configurer)
+	public static IServiceCollection AddConfigurer<TConfigurer, TOptions>(this IServiceCollection self)
+		where TConfigurer : class, IConfigurer<TOptions>
 		where TOptions : class
+		=> self.AddScoped<IConfigurer<TOptions>, TConfigurer>();
+
+	/// <summary>
+	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c>
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="TConfigurer">the type of the configurer</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection AddConfigurer<TConfigurer>(this IServiceCollection self)
+		=> AddConfigurer<TConfigurer>(self, false);
+
+	private static IServiceCollection AddConfigurer<TConfigurer>(
+		this IServiceCollection self,
+		bool tryAdd)
 	{
-		self.TryAddSingleton(configurer);
+		var configurerType = typeof(TConfigurer);
+		var interfaceType = configurerType
+			.GetInterfaces()
+			.FirstOrDefault(
+				i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IConfigurer<>));
+
+		if (interfaceType is null)
+		{
+			throw new InvalidOperationException($"Type {configurerType} does not inherit from {typeof(IConfigurer<>)}.");
+		}
+
+		if (tryAdd)
+		{
+			self.TryAddScoped(interfaceType, configurerType);
+		}
+		else
+		{
+			self.AddScoped(interfaceType, configurerType);
+		}
+
 		return self;
 	}
 
