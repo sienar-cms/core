@@ -291,6 +291,20 @@ public static class SienarUtilsServiceCollectionExtensions
 		return self;
 	}
 
+	/// <summary>
+	/// Adds a result processor (<c>IProcessor&lt;TRequest&gt;</c>)
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="TProcessor">the processor implementation</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection AddResultProcessor<TProcessor>(
+		this IServiceCollection self)
+		=> self.AddImplementationAsInterface(
+			typeof(TProcessor),
+			typeof(IProcessor<>),
+			ServiceLifetime.Scoped,
+			false);
+
 	private static IServiceCollection AddImplementationAsInterface(
 		this IServiceCollection self,
 		Type implementationType,
