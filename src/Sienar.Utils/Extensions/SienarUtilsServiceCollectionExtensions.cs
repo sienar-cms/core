@@ -158,6 +158,20 @@ public static class SienarUtilsServiceCollectionExtensions
 		=> self.AddScoped<IStateValidator<TRequest>, TValidator>();
 
 	/// <summary>
+	/// Adds a state validator for the given <c>TRequest</c>
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="TValidator">the validator implementation</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection AddStateValidator<TValidator>(
+		this IServiceCollection self)
+		=> self.AddImplementationAsInterface(
+			typeof(TValidator),
+			typeof(IStateValidator<>),
+			ServiceLifetime.Scoped,
+			false);
+
+	/// <summary>
 	/// Adds a before-process hook for the given <c>TRequest</c>
 	/// </summary>
 	/// <param name="self">the service collection</param>
