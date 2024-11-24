@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sienar.Extensions;
@@ -139,7 +140,9 @@ public sealed class SienarWebAppBuilder
 	/// <returns>the new <see cref="WebApplication"/></returns>
 	public WebApplication Build()
 	{
-		StartupServices.AddSingleton(Builder.Environment);
+		StartupServices
+			.AddSingleton(Builder.Environment)
+			.AddSingleton<IConfiguration>(Builder.Configuration);
 
 		var container = StartupServices.BuildServiceProvider();
 		using var scope = container.CreateScope();
