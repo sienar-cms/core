@@ -184,6 +184,20 @@ public static class SienarUtilsServiceCollectionExtensions
 		=> self.AddScoped<IBeforeProcess<TRequest>, THook>();
 
 	/// <summary>
+	/// Adds a before-process hook for the given <c>TRequest</c>
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="THook">the hook implementation</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection AddBeforeHook<THook>(
+		this IServiceCollection self)
+		=> self.AddImplementationAsInterface(
+			typeof(THook),
+			typeof(IBeforeProcess<>),
+			ServiceLifetime.Scoped,
+			false);
+
+	/// <summary>
 	/// Adds an after-process hook for the given <c>TRequest</c>
 	/// </summary>
 	/// <param name="self">the service collection</param>
