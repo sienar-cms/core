@@ -100,7 +100,11 @@ public static class SienarUtilsServiceCollectionExtensions
 	/// <typeparam name="TConfigurer">the type of the configurer</typeparam>
 	/// <returns>the service collection</returns>
 	public static IServiceCollection AddConfigurer<TConfigurer>(this IServiceCollection self)
-		=> AddConfigurer<TConfigurer>(self, false);
+		=> self.AddImplementationAsInterface(
+			typeof(TConfigurer),
+			typeof(IConfigurer<>),
+			ServiceLifetime.Scoped,
+			false);
 
 	/// <summary>
 	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c> if one hasn't already been registered
@@ -109,34 +113,11 @@ public static class SienarUtilsServiceCollectionExtensions
 	/// <typeparam name="TConfigurer">the type of the configurer</typeparam>
 	/// <returns>the service collection</returns>
 	public static IServiceCollection TryAddConfigurer<TConfigurer>(this IServiceCollection self)
-		=> AddConfigurer<TConfigurer>(self, true);
-
-	private static IServiceCollection AddConfigurer<TConfigurer>(
-		this IServiceCollection self,
-		bool tryAdd)
-	{
-		var configurerType = typeof(TConfigurer);
-		var interfaceType = configurerType
-			.GetInterfaces()
-			.FirstOrDefault(
-				i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IConfigurer<>));
-
-		if (interfaceType is null)
-		{
-			throw new InvalidOperationException($"Type {configurerType} does not inherit from {typeof(IConfigurer<>)}.");
-		}
-
-		if (tryAdd)
-		{
-			self.TryAddScoped(interfaceType, configurerType);
-		}
-		else
-		{
-			self.AddScoped(interfaceType, configurerType);
-		}
-
-		return self;
-	}
+		=> self.AddImplementationAsInterface(
+			typeof(TConfigurer),
+			typeof(IConfigurer<>),
+			ServiceLifetime.Scoped,
+			true);
 
 	/// <summary>
 	/// Adds an access validator for the given <c>TRequest</c>
@@ -226,6 +207,41 @@ public static class SienarUtilsServiceCollectionExtensions
 		where TProcessor : class, IProcessor<TResult>
 	{
 		self.TryAddScoped<IProcessor<TResult>, TProcessor>();
+		return self;
+	}
+
+	private static IServiceCollection AddImplementationAsInterface(
+		this IServiceCollection self,
+		Type implementationType,
+		Type interfaceType,
+		ServiceLifetime lifetime,
+		bool tryAdd)
+	{
+		var concreteInterfaceTypes = implementationType
+			.GetInterfaces()
+			.Where(
+				i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
+		var implementsSpecifiedInterface = false;
+
+		foreach (var t in concreteInterfaceTypes)
+		{
+			implementsSpecifiedInterface = true;
+			var descriptor = new ServiceDescriptor(t, implementationType, lifetime);
+			if (tryAdd)
+			{
+				self.TryAdd(descriptor);
+			}
+			else
+			{
+				self.Add(descriptor);
+			}
+		}
+
+		if (!implementsSpecifiedInterface)
+		{
+			throw new InvalidOperationException($"Type {implementationType} does not inherit from {interfaceType}.");
+		}
+
 		return self;
 	}
 }
