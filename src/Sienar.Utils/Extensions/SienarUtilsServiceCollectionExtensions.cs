@@ -210,6 +210,20 @@ public static class SienarUtilsServiceCollectionExtensions
 		=> self.AddScoped<IAfterProcess<TRequest>, THook>();
 
 	/// <summary>
+	/// Adds an after-process hook for the given <c>TRequest</c>
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="THook">the hook implementation</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection AddAfterHook<THook>(
+		this IServiceCollection self)
+		=> self.AddImplementationAsInterface(
+			typeof(THook),
+			typeof(IAfterProcess<>),
+			ServiceLifetime.Scoped,
+			false);
+
+	/// <summary>
 	/// Adds a processor
 	/// </summary>
 	/// <param name="self">the service collection</param>
