@@ -139,6 +139,8 @@ public sealed class SienarWebAppBuilder
 	/// <returns>the new <see cref="WebApplication"/></returns>
 	public WebApplication Build()
 	{
+		StartupServices.AddSingleton(Builder.Environment);
+
 		var container = StartupServices.BuildServiceProvider();
 		using var scope = container.CreateScope();
 		var startupServiceProvider = scope.ServiceProvider;
