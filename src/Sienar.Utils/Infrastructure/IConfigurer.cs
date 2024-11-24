@@ -14,8 +14,5 @@ public interface IConfigurer<TOptions> where TOptions : class
 	/// Configures an instance of <c>T</c>
 	/// </summary>
 	/// <param name="options">the instance of <c>T</c> to configure</param>
-	/// <param name="config">the configuration container</param>
-	void Configure(
-		TOptions options,
-		IConfiguration config);
+	void Configure(TOptions options);
 }

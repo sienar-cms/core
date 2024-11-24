@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sienar.Extensions;
@@ -139,6 +140,10 @@ public sealed class SienarWebAppBuilder
 	/// <returns>the new <see cref="WebApplication"/></returns>
 	public WebApplication Build()
 	{
+		StartupServices
+			.AddSingleton(Builder.Environment)
+			.AddSingleton<IConfiguration>(Builder.Configuration);
+
 		var container = StartupServices.BuildServiceProvider();
 		using var scope = container.CreateScope();
 		var startupServiceProvider = scope.ServiceProvider;
@@ -155,14 +160,16 @@ public sealed class SienarWebAppBuilder
 		if (authorizationConfigurer is not null)
 		{
 			usesAuthorization = true;
-			Builder.Services.AddAuthorization(o => authorizationConfigurer.Configure(o, Builder.Configuration));
+			Builder.Services.AddAuthorization(
+				o => authorizationConfigurer.Configure(o));
 		}
 
 		if (authenticationConfigurer is not null)
 		{
 			usesAuthentication = true;
-			var authBuilder = Builder.Services.AddAuthentication(o => authenticationConfigurer.Configure(o, Builder.Configuration));
-			authenticationOptionsConfigurer?.Configure(authBuilder, Builder.Configuration);
+			var authBuilder = Builder.Services.AddAuthentication(
+				o => authenticationConfigurer.Configure(o));
+			authenticationOptionsConfigurer?.Configure(authBuilder);
 		}
 
 		// Configure antiforgery
@@ -170,9 +177,7 @@ public sealed class SienarWebAppBuilder
 		if (antiforgeryConfigurer is not null)
 		{
 			Builder.Services.AddAntiforgery(
-				o => antiforgeryConfigurer.Configure(
-					o,
-					Builder.Configuration));
+				o => antiforgeryConfigurer.Configure(o));
 		}
 
 		// Configure MVC
@@ -182,13 +187,11 @@ public sealed class SienarWebAppBuilder
 		if (mvcConfigurer is not null)
 		{
 			var mvcBuilder = Builder.Services.AddControllersWithViews(
-				o => mvcConfigurer.Configure(
-					o,
-					Builder.Configuration));
+				o => mvcConfigurer.Configure(o));
 
 			foreach (var configurer in additionalMvcConfigurers)
 			{
-				configurer.Configure(mvcBuilder, Builder.Configuration);
+				configurer.Configure(mvcBuilder);
 			}
 		}
 
@@ -197,7 +200,7 @@ public sealed class SienarWebAppBuilder
 		if (corsConfigurer is not null)
 		{
 			usesCors = true;
-			Builder.Services.AddCors(o => corsConfigurer.Configure(o, Builder.Configuration));
+			Builder.Services.AddCors(o => corsConfigurer.Configure(o));
 		}
 
 		// Build the app
@@ -227,7 +230,7 @@ public sealed class SienarWebAppBuilder
 					var corsMiddlewareConfigurer = startupServiceProvider.GetService<IConfigurer<CorsPolicyBuilder>>();
 					if (corsMiddlewareConfigurer is not null)
 					{
-						app.UseCors(o => corsMiddlewareConfigurer.Configure(o, app.Configuration));
+						app.UseCors(o => corsMiddlewareConfigurer.Configure(o));
 					}
 					else
 					{
