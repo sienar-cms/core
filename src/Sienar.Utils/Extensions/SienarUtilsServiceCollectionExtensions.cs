@@ -339,12 +339,9 @@ public static class SienarUtilsServiceCollectionExtensions
 	/// <typeparam name="TProcessor">the processor implementation</typeparam>
 	/// <returns>the service collection</returns>
 	public static IServiceCollection AddResultProcessor<TResult, TProcessor>(
-        this IServiceCollection self)
+		this IServiceCollection self)
 		where TProcessor : class, IProcessor<TResult>
-	{
-		self.TryAddScoped<IProcessor<TResult>, TProcessor>();
-		return self;
-	}
+		=> self.AddScoped<IProcessor<TResult>, TProcessor>();
 
 	/// <summary>
 	/// Adds a result processor (<c>IProcessor&lt;TRequest&gt;</c>)
