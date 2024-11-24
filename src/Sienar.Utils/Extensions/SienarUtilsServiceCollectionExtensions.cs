@@ -360,6 +360,35 @@ public static class SienarUtilsServiceCollectionExtensions
 			ServiceLifetime.Scoped,
 			false);
 
+	/// <summary>
+	/// Adds a result processor (<c>IProcessor&lt;TRequest&gt;</c>)
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="TResult">the data type of the result</typeparam>
+	/// <typeparam name="TProcessor">the processor implementation</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection TryAddResultProcessor<TResult, TProcessor>(
+		this IServiceCollection self)
+		where TProcessor : class, IProcessor<TResult>
+	{
+		self.TryAddScoped<IProcessor<TResult>, TProcessor>();
+		return self;
+	}
+
+	/// <summary>
+	/// Adds a result processor (<c>IProcessor&lt;TRequest&gt;</c>)
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="TProcessor">the processor implementation</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection TryAddResultProcessor<TProcessor>(
+		this IServiceCollection self)
+		=> self.AddImplementationAsInterface(
+			typeof(TProcessor),
+			typeof(IProcessor<>),
+			ServiceLifetime.Scoped,
+			true);
+
 	private static IServiceCollection AddImplementationAsInterface(
 		this IServiceCollection self,
 		Type implementationType,
