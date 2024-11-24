@@ -79,6 +79,19 @@ public static class SienarUtilsServiceCollectionExtensions
 		=> self.AddScoped<IConfigurer<TOptions>, TConfigurer>();
 
 	/// <summary>
+	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c>
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="TConfigurer">the type of the configurer</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection AddConfigurer<TConfigurer>(this IServiceCollection self)
+		=> self.AddImplementationAsInterface(
+			typeof(TConfigurer),
+			typeof(IConfigurer<>),
+			ServiceLifetime.Scoped,
+			false);
+
+	/// <summary>
 	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c> if one hasn't already been registered
 	/// </summary>
 	/// <param name="self">the service collection</param>
@@ -92,19 +105,6 @@ public static class SienarUtilsServiceCollectionExtensions
 		self.TryAddScoped<IConfigurer<TOptions>, TConfigurer>();
 		return self;
 	}
-
-	/// <summary>
-	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c>
-	/// </summary>
-	/// <param name="self">the service collection</param>
-	/// <typeparam name="TConfigurer">the type of the configurer</typeparam>
-	/// <returns>the service collection</returns>
-	public static IServiceCollection AddConfigurer<TConfigurer>(this IServiceCollection self)
-		=> self.AddImplementationAsInterface(
-			typeof(TConfigurer),
-			typeof(IConfigurer<>),
-			ServiceLifetime.Scoped,
-			false);
 
 	/// <summary>
 	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c> if one hasn't already been registered
