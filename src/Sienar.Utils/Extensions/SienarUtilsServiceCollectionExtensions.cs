@@ -79,6 +79,21 @@ public static class SienarUtilsServiceCollectionExtensions
 		=> self.AddScoped<IConfigurer<TOptions>, TConfigurer>();
 
 	/// <summary>
+	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c> if one hasn't already been registered
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="TConfigurer">the type of the configurer</typeparam>
+	/// <typeparam name="TOptions">the type of the options class to configure</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection TryAddConfigurer<TConfigurer, TOptions>(this IServiceCollection self)
+		where TConfigurer : class, IConfigurer<TOptions>
+		where TOptions : class
+	{
+		self.TryAddScoped<IConfigurer<TOptions>, TConfigurer>();
+		return self;
+	}
+
+	/// <summary>
 	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c>
 	/// </summary>
 	/// <param name="self">the service collection</param>
@@ -86,6 +101,15 @@ public static class SienarUtilsServiceCollectionExtensions
 	/// <returns>the service collection</returns>
 	public static IServiceCollection AddConfigurer<TConfigurer>(this IServiceCollection self)
 		=> AddConfigurer<TConfigurer>(self, false);
+
+	/// <summary>
+	/// Adds a configurer of type <c>IConfigurer&lt;TOptions&gt;</c> for the given <c>TOptions</c> if one hasn't already been registered
+	/// </summary>
+	/// <param name="self">the service collection</param>
+	/// <typeparam name="TConfigurer">the type of the configurer</typeparam>
+	/// <returns>the service collection</returns>
+	public static IServiceCollection TryAddConfigurer<TConfigurer>(this IServiceCollection self)
+		=> AddConfigurer<TConfigurer>(self, true);
 
 	private static IServiceCollection AddConfigurer<TConfigurer>(
 		this IServiceCollection self,
