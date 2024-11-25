@@ -243,9 +243,7 @@ public sealed class SienarWebAppBuilder
 			Priority.Normal,
 			app =>
 			{
-				app
-					.UseMiddleware<CsrfMiddleware>()
-					.UseRouting();
+				app.UseRouting();
 			});
 
 		MiddlewareProvider.AddWithPriority(
@@ -256,6 +254,8 @@ public sealed class SienarWebAppBuilder
 				{
 					app.UseAuthentication();
 				}
+
+				app.UseMiddleware<CsrfMiddleware>();
 
 				if (usesAuthorization)
 				{
