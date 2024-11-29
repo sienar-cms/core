@@ -13,11 +13,11 @@
 		<Authors>Christian LeVesque</Authors>
 		<Description>A Sienar package that adds support for RESTful repositories</Description>
 		<Copyright>Copyright 2024 Christian LeVesque</Copyright>
-		<PackageProjectUrl>https://sienar.levesque.dev</PackageProjectUrl>
+		<PackageProjectUrl>https://sienar.io</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/sienar-cms/sienar</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageTags>sienar cms utilities blazor plugin</PackageTags>
+		<PackageTags>sienar cms utilities rest plugin</PackageTags>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	</PropertyGroup>
 
