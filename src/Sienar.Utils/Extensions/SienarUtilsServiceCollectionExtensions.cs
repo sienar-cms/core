@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Sienar.Email;
 using Sienar.Hooks;
 using Sienar.Infrastructure;
 using Sienar.Processors;
@@ -42,6 +43,7 @@ public static class SienarUtilsServiceCollectionExtensions
 		self.TryAddScoped<IMenuGenerator, MenuGenerator>();
 		self.TryAddSingleton<IScriptProvider, ScriptProvider>();
 		self.TryAddSingleton<IStyleProvider, StyleProvider>();
+		self.TryAddScoped<IEmailSender, DefaultEmailSender>();
 
 		return self;
 	}
