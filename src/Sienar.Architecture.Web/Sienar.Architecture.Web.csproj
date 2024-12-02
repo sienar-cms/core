@@ -15,7 +15,7 @@
 		<Copyright>Copyright 2024 Christian LeVesque</Copyright>
 		<PackageProjectUrl>https://sienar.io</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/sienar-cms/sienar</RepositoryUrl>
+		<RepositoryUrl>https://github.com/sienar-cms/core</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>sienar cms utilities web plugin</PackageTags>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
