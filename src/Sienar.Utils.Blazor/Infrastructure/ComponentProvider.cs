@@ -8,6 +8,7 @@ namespace Sienar.Infrastructure;
 public class ComponentProvider : IComponentProvider
 {
 	public Type? DefaultLayout { get; set; }
+	public Type NotFoundView { get; set; } = null!;
 	public Type? Dashboard { get; set; }
 	public Type? AppbarLeft { get; set; }
 	public Type? AppbarRight { get; set; }

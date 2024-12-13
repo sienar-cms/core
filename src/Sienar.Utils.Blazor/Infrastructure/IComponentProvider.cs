@@ -13,6 +13,11 @@ public interface IComponentProvider
 	public Type? DefaultLayout { get; set; }
 
 	/// <summary>
+	/// The component to render when no route is matched by the router
+	/// </summary>
+	public Type NotFoundView { get; set; }
+
+	/// <summary>
 	/// A component to render in place of the default dashboard UI
 	/// </summary>
 	public Type? Dashboard { get; set; }
