@@ -1,0 +1,51 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Sienar.Extensions
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Sienar.Infrastructure
+
+@namespace Sienar.Components
+
+@inject IStyleProvider StyleProvider
+@inject IScriptProvider ScriptProvider
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+
+    @foreach (var stylesheet in StyleProvider)
+    {
+        <link
+            href="@stylesheet.Href"
+            crossorigin="@stylesheet.CrossOriginMode.GetHtmlValue()"
+            referrerpolicy="@stylesheet.ReferrerPolicy.GetHtmlValue()"
+            integrity="@stylesheet.Integrity"
+            rel="stylesheet"
+        />
+    }
+
+    @foreach (var script in ScriptProvider)
+    {
+        <script
+            type="@script.GetScriptType()"
+            src="@script.Src"
+            crossorigin="@script.CrossOriginMode.GetHtmlValue()"
+            referrerpolicy="@script.ReferrerPolicy.GetHtmlValue()"
+            integrity="@script.Integrity"
+            async="@script.IsAsync"
+            defer="@script.ShouldDefer"
+        ></script>
+    }
+
+    <HeadOutlet @rendermode="InteractiveWebAssembly" />
+</head>
+
+<body>
+    <SienarRoutes @rendermode="InteractiveWebAssembly" />
+    <script src="/_framework/blazor.web.js"></script>
+</body>
+
+</html>
