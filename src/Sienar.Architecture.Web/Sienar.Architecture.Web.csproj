@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
@@ -31,6 +31,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.0" />
 
 		<ProjectReference
 			Condition=" '$(Configuration)' != 'Release' "
@@ -38,6 +39,12 @@
 		<PackageReference
 			Condition=" '$(Configuration)' == 'Release' "
 			Include="Sienar.Utils" Version="0.1.1"/>
+		<ProjectReference
+			Condition=" '$(Configuration)' != 'Release' "
+			Include="..\Sienar.Utils.Blazor\Sienar.Utils.Blazor.csproj"/>
+		<PackageReference
+			Condition=" '$(Configuration)' == 'Release' "
+			Include="Sienar.Utils.Blazor" Version="0.1.0"/>
 	</ItemGroup>
 
 </Project>
