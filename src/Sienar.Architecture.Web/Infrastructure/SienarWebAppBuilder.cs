@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Endpoints;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Sienar.Components;
 using Sienar.Extensions;
 using Sienar.Plugins;
 
@@ -142,7 +144,8 @@ public sealed class SienarWebAppBuilder
 	{
 		StartupServices
 			.AddSingleton(Builder.Environment)
-			.AddSingleton<IConfiguration>(Builder.Configuration);
+			.AddSingleton<IConfiguration>(Builder.Configuration)
+			.AddSingleton<IRoutableAssemblyProvider>(new RoutableAssemblyProvider());
 
 		var container = StartupServices.BuildServiceProvider();
 		using var scope = container.CreateScope();
@@ -150,6 +153,7 @@ public sealed class SienarWebAppBuilder
 
 		var usesAuthorization = false;
 		var usesAuthentication = false;
+		var usesBlazor = false;
 		var usesCors = false;
 
 		// Configure auth
@@ -192,6 +196,24 @@ public sealed class SienarWebAppBuilder
 			foreach (var configurer in additionalMvcConfigurers)
 			{
 				configurer.Configure(mvcBuilder);
+			}
+		}
+
+		// Configure Blazor
+		var blazorConfigurer = startupServiceProvider.GetService<IConfigurer<RazorComponentsServiceOptions>>();
+		var additionalBlazorConfigurers = startupServiceProvider.GetServices<IConfigurer<IRazorComponentsBuilder>>();
+
+		if (blazorConfigurer is not null)
+		{
+			usesBlazor = true;
+
+			var blazorBuilder = Builder.Services
+				.AddRazorComponents(o => blazorConfigurer.Configure(o))
+				.AddInteractiveWebAssemblyComponents();
+
+			foreach (var configurer in additionalBlazorConfigurers)
+			{
+				configurer.Configure(blazorBuilder);
 			}
 		}
 
@@ -265,7 +287,22 @@ public sealed class SienarWebAppBuilder
 
 		MiddlewareProvider.AddWithPriority(
 			Priority.Lowest,
-			app => app.MapControllers());
+			app =>
+			{
+				app.MapControllers();
+
+				if (usesBlazor)
+				{
+					var blazorEndpointBuilder = app.MapRazorComponents<SienarApp>()
+						.AddInteractiveWebAssemblyRenderMode();
+					var routableAssemblyProvider = startupServiceProvider.GetRequiredService<IRoutableAssemblyProvider>();
+
+					foreach (var assembly in routableAssemblyProvider)
+					{
+						blazorEndpointBuilder.AddAdditionalAssemblies(assembly);
+					}
+				}
+			});
 
 		foreach (var middleware in MiddlewareProvider.AggregatePrioritized())
 		{
