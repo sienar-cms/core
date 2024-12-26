@@ -8,8 +8,6 @@ namespace Sienar.Infrastructure;
 /// </summary>
 public class CsrfMiddleware
 {
-	private const string CsrfTokenCookieName = "";
-
 	private readonly RequestDelegate _next;
 
 	/// <exclude />
@@ -25,7 +23,7 @@ public class CsrfMiddleware
 	{
 		// if the request doesn't contain the CSRF token cookie
 		// generate the antiforgery token
-		if (!context.Request.Cookies.ContainsKey(CsrfTokenCookieName))
+		if (!context.Request.Cookies.ContainsKey(ICsrfTokenRefresher.CsrfTokenCookieName))
 		{
 			await tokenRefresher.RefreshToken();
 		}
