@@ -8,7 +8,7 @@
 
 		<PackageId>Sienar.Architecture.Web</PackageId>
 		<Title>Sienar.Architecture.Web</Title>
-		<PackageVersion>0.1.0</PackageVersion>
+		<PackageVersion>0.1.1</PackageVersion>
 		<PackageReleaseNotes>Initial release</PackageReleaseNotes>
 		<Authors>Christian LeVesque</Authors>
 		<Description>Contains the code infrastructure needed to create a Sienar web app plugin</Description>
@@ -37,7 +37,7 @@
 			Include="..\Sienar.Utils\Sienar.Utils.csproj"/>
 		<PackageReference
 			Condition=" '$(Configuration)' == 'Release' "
-			Include="Sienar.Utils" Version="0.1.0"/>
+			Include="Sienar.Utils" Version="0.1.1"/>
 	</ItemGroup>
 
 </Project>

@@ -8,7 +8,7 @@
 
 		<PackageId>Sienar.Utils</PackageId>
 		<Title>Sienar.Utils</Title>
-		<PackageVersion>0.1.0</PackageVersion>
+		<PackageVersion>0.1.1</PackageVersion>
 		<PackageReleaseNotes>Initial release</PackageReleaseNotes>
 		<Authors>Christian LeVesque</Authors>
 		<Description>Contains the Sienar utilities used to create apps with a core set of features, such as menu generation, enqueueing scripts and styles, CRUD data stores, and more.</Description>
