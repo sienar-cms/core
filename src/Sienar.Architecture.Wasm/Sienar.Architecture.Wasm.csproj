@@ -34,7 +34,7 @@
 			Include="..\Sienar.Utils\Sienar.Utils.csproj"/>
 		<PackageReference
 			Condition=" '$(Configuration)' == 'Release' "
-			Include="Sienar.Utils" Version="0.1.0"/>
+			Include="Sienar.Utils" Version="0.1.1"/>
 		<ProjectReference
 			Condition=" '$(Configuration)' != 'Release' "
 			Include="..\Sienar.Utils.Blazor\Sienar.Utils.Blazor.csproj"/>
