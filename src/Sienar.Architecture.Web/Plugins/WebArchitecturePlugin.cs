@@ -49,7 +49,6 @@ public class WebArchitecturePlugin : IPlugin
 	public void Configure()
 	{
 		ConfigureAuth();
-		ConfigureAntiforgery();
 		ConfigureCors();
 
 		_middlewareProvider.AddWithPriority(
@@ -57,6 +56,8 @@ public class WebArchitecturePlugin : IPlugin
 			app => app.UseStaticFiles());
 
 		_middlewareProvider.AddWithNormalPriority(app => app.UseRouting());
+
+		ConfigureAntiforgery();
 	}
 
 	private void ConfigureAuth()
@@ -93,6 +94,9 @@ public class WebArchitecturePlugin : IPlugin
 		{
 			_builder.Services.AddAntiforgery(
 				o => _antiforgeryConfigurer.Configure(o));
+
+			_middlewareProvider.AddWithNormalPriority(
+				app => app.UseAntiforgery());
 		}
 	}
 
