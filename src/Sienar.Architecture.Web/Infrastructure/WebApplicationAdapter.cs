@@ -25,6 +25,7 @@ public class WebApplicationAdapter : IApplicationAdapter<WebApplicationBuilder>
 			.AddSingleton(Builder)
 			.AddSingleton(Builder.Environment)
 			.AddSingleton<IConfiguration>(Builder.Configuration)
+			.AddSingleton<IApplicationAdapter>(this)
 			.AddSingleton<MiddlewareProvider>();
 	}
 
