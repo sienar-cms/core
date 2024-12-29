@@ -1,0 +1,21 @@
+﻿.extra-special-form-field {
+    position: fixed;
+    top: -1px;
+    left: -1px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    z-index: -9999;
+}
+
+.h-auto {
+	height: auto;
+}
+
+.min-vh-100 {
+	min-height: 100vh;
+}
+
+.d-contents {
+	display: contents;
+}
