@@ -1,0 +1,38 @@
+﻿@using Sienar.Infrastructure
+@using Sienar.Plugins
+@inject IComponentProvider ComponentProvider
+
+<div class="flex-grow-1">
+	<OptionalComponent Type="@ComponentProvider.SidebarHeader"/>
+
+	<MudNavMenu>
+		@for (var i = 0; i < Menus.Count; i++)
+		{
+			if (i > 0)
+			{
+				<MudDivider Class="my-3"/>
+			}
+
+			@foreach (var link in Menus[i])
+			{
+				<SidebarNavMenuLink Link="link"/>
+			}
+		}
+	</MudNavMenu>
+</div>
+
+<div>
+	<div class="pa-4">
+		<OptionalComponent Type="@ComponentProvider.SidebarFooter"/>
+	</div>
+</div>
+
+@code {
+
+	/// <summary>
+	/// Contains the grouped menu links to be rendered
+	/// </summary>
+	[Parameter]
+    public required List<List<MenuLink>> Menus { get; set; }
+
+}

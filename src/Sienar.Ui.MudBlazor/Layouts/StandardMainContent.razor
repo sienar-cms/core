@@ -1,0 +1,39 @@
+﻿<MudMainContent Class="@_mainContentClass">
+	<MudContainer
+		Class="@_containerClass"
+		MaxWidth="MaxWidth.False">
+		@ChildContent
+	</MudContainer>
+</MudMainContent>
+
+@code {
+
+	private string? _mainContentClass;
+	private string _containerClass = null!;
+
+	[Parameter]
+	public required RenderFragment ChildContent { get; set; }
+
+	[Parameter]
+    public bool Padded { get; set; }
+
+	[Parameter]
+    public bool TopPadded { get; set; }
+
+	[Parameter]
+    public bool TopPaddedOnSmall { get; set; }
+
+	/// <inheritdoc />
+	protected override void OnInitialized()
+	{
+		if (Padded)
+		{
+			_mainContentClass = "px-16 pb-16";
+		}
+
+		if (TopPadded) _containerClass = "px-0 pt-16";
+		else if (TopPaddedOnSmall) _containerClass = "px-0 pt-16 pt-lg-0";
+		else _containerClass = "px-0";
+	}
+
+}

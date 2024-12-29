@@ -1,0 +1,31 @@
+﻿@implements IDisposable
+@inject ThemeState ThemeState
+
+<MudThemeProvider
+	IsDarkMode="@ThemeState.IsDarkMode"
+	Theme="@ThemeState.Theme"/>
+<MudDialogProvider
+	CloseOnEscapeKey="true"
+	NoHeader="true"
+	FullWidth="true"
+	MaxWidth="MaxWidth.Small"/>
+<MudSnackbarProvider/>
+
+@code {
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        ThemeState.OnChange += StateHasChanged;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        ThemeState.OnChange -= StateHasChanged;
+        GC.SuppressFinalize(this);
+    }
+
+}

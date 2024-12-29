@@ -1,0 +1,10 @@
+﻿<MudLayout Class="min-vh-100">
+	@ChildContent
+</MudLayout>
+
+@code {
+
+	[Parameter]
+	public required RenderFragment ChildContent { get; set; }
+
+}

@@ -1,0 +1,83 @@
+﻿@inherits NavBase
+@implements IBrowserViewportObserver
+@using MudBlazor.Services
+@implements IAsyncDisposable
+
+<MudHidden Breakpoint="Breakpoint.LgAndUp">
+	<MudAppBar Elevation="1">
+		<MudIconButton
+			Icon="@Icons.Material.Filled.Menu"
+			Color="Color.Inherit"
+			OnClick="ToggleDrawer"/>
+	</MudAppBar>
+</MudHidden>
+
+<MudDrawer
+	Elevation="1"
+	@bind-Open="Open"
+	Variant="DrawerVariant">
+	<DrawerNavContent Menus="Menus"/>
+</MudDrawer>
+
+@code {
+
+	private bool _open;
+
+	private bool Open
+	{
+		get => _breakpoint >= Breakpoint.Lg || _open;
+		set => _open = value;
+	}
+
+	private DrawerVariant DrawerVariant => _breakpoint >= Breakpoint.Lg
+		? DrawerVariant.Persistent
+		: DrawerVariant.Temporary;
+
+	/// <summary>
+	/// The current browser breakpoint size
+	/// </summary>
+	private Breakpoint _breakpoint = Breakpoint.Lg;
+
+	/// <inheritdoc />
+	Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
+
+	/// <inheritdoc />
+	ResizeOptions? IBrowserViewportObserver.ResizeOptions { get; } = new()
+	{
+		ReportRate = 250,
+		NotifyOnBreakpointOnly = true
+	};
+
+	[Inject]
+	private IBrowserViewportService BrowserViewportService { get; set; } = null!;
+
+	/// <inheritdoc />
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await BrowserViewportService.SubscribeAsync(this, fireImmediately: true);
+		}
+	}
+
+	/// <inheritdoc />
+	Task IBrowserViewportObserver.NotifyBrowserViewportChangeAsync(
+		BrowserViewportEventArgs browserViewportEventArgs)
+	{
+		_breakpoint = browserViewportEventArgs.Breakpoint;
+		return InvokeAsync(StateHasChanged);
+	}
+
+	/// <inheritdoc />
+	public async ValueTask DisposeAsync()
+	{
+		await BrowserViewportService.UnsubscribeAsync(this);
+		GC.SuppressFinalize(this);
+	}
+
+	private void ToggleDrawer()
+	{
+		_open = !_open;
+	}
+
+}

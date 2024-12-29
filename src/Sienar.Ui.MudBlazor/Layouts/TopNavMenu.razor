@@ -1,0 +1,50 @@
+﻿@using Sienar.Plugins
+@inherits NavBase
+@inject IComponentProvider ComponentProvider
+ 
+<MudAppBar Elevation="1">
+	<MudHidden Breakpoint="Breakpoint.LgAndUp">
+		<MudIconButton
+			Icon="@Icons.Material.Filled.Menu"
+			Color="Color.Inherit"
+			OnClick="@(() => _open = !_open)"/>
+	</MudHidden>
+
+	<MudHidden Breakpoint="Breakpoint.MdAndDown">
+		<OptionalComponent Type="@ComponentProvider.AppbarLeft"/>
+
+		@for (var i = 0; i < Menus.Count; i++)
+		{
+			if (i > 0)
+			{
+				<MudDivider
+					Class="ma-4"
+					DividerType="DividerType.Middle"
+					FlexItem
+					Vertical/>
+			}
+
+			@foreach (var link in Menus[i])
+			{
+				<TopNavMenuLink Link="link"/>
+			}
+		}
+
+		<OptionalComponent Type="ComponentProvider.AppbarRight"/>
+	</MudHidden>
+</MudAppBar>
+
+<MudHidden Breakpoint="Breakpoint.LgAndUp">
+	<MudDrawer
+		Elevation="1"
+		@bind-Open="_open"
+		Variant="DrawerVariant.Temporary">
+		<DrawerNavContent Menus="Menus"/>
+	</MudDrawer>
+</MudHidden>
+
+@code {
+
+	private bool _open;
+
+}
