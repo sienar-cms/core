@@ -1,4 +1,7 @@
-﻿# Sienar
+# Sienar
+
+This repository is archived. Development has been moved to a monorepo at [https://github.com/sienar-cms/sienar](https://github.com/sienar-cms/sienar), which is under active development.
+
 ## An application development framework built on top of ASP.NET and .NET MAUI
 
 Sienar is a framework for building desktop and web applications. When building web applications with Sienar, a small CMS is also available.
