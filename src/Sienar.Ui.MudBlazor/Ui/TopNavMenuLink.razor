@@ -1,0 +1,78 @@
+﻿@if (!_hasSublinks)
+{
+	<MudButton
+		Class="mr-4"
+		Color="Color.Inherit"
+		Href="@Link.Url"
+		StartIcon="@Link.Icon"
+		IconColor="Color.Inherit"
+		Variant="Variant.Text">
+		@Link.Text
+	</MudButton>
+}
+else
+{
+	<MudMenu
+		Class="mr-4"
+		ListClass="d-flex px-4 pb-2"
+		Color="Color.Inherit"
+		Variant="Variant.Text"
+		Label="@Link.Text"
+		StartIcon="@Link.Icon"
+		EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
+		AnchorOrigin="Origin.BottomCenter"
+		TransformOrigin="Origin.TopCenter"
+		LockScroll>
+		@if (_hasNestedSublinks)
+		{
+			@foreach (var sublink in Link.Sublinks!)
+			{
+				<MudList Clickable>
+					<MudListSubheader>
+						@sublink.Text
+					</MudListSubheader>
+					@foreach (var nestedSublink in sublink.Sublinks!)
+					{
+						<MudListItem
+							Href="@nestedSublink.Url"
+							Icon="@nestedSublink.Icon">
+							@nestedSublink.Text
+						</MudListItem>
+					}
+				</MudList>
+			}
+		}
+		else
+		{
+			<MudList Clickable>
+				@foreach (var sublink in Link.Sublinks!)
+				{
+					<MudListItem
+						Href="@sublink.Url"
+						Icon="@sublink.Icon">
+						@sublink.Text
+					</MudListItem>
+				}
+			</MudList>
+		}
+	</MudMenu>
+}
+
+@code {
+
+	private bool _hasSublinks;
+	private bool _hasNestedSublinks;
+
+	[Parameter]
+	public required MenuLink Link { get; set; }
+
+	/// <inheritdoc />
+	protected override void OnInitialized()
+	{
+		_hasSublinks = Link.Sublinks is not null;
+		_hasNestedSublinks = Link.Sublinks?
+			.FirstOrDefault()
+			?.Sublinks is not null;
+	}
+
+}

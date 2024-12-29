@@ -1,0 +1,69 @@
+﻿<MudCard
+	Class="@Class"
+	Square="Square">
+	<MudCardHeader class="@CreateHeaderClasses()">
+		<div>
+			<H6 Class="mb-0">
+				@Title
+			</H6>
+			@if (!string.IsNullOrEmpty(Subtitle))
+			{
+				<MudText Typo="Typo.caption">
+					@Subtitle
+				</MudText>
+			}
+		</div>
+
+		@if (!string.IsNullOrEmpty(Icon))
+		{
+			<MudIcon
+				Icon="@Icon"
+				Title="@IconTitle"/>
+		}
+	</MudCardHeader>
+
+	<MudCardContent>
+		@CardContent
+	</MudCardContent>
+
+	@if (CardActions is not null)
+	{
+		<MudCardActions Class="pa-4">
+			@CardActions
+		</MudCardActions>
+	}
+</MudCard>
+
+@code {
+
+	[Parameter]
+	public string? Title { get; set; }
+
+	[Parameter]
+	public Color ThemeColor { get; set; } = Color.Primary;
+
+	[Parameter]
+	public string? Class { get; set; }
+
+	[Parameter]
+	public bool Square { get; set; }
+
+	[Parameter]
+	public string? Subtitle { get; set; }
+
+	[Parameter]
+	public string? Icon { get; set; }
+
+	[Parameter]
+    public string? IconTitle { get; set; }
+
+	[Parameter]
+	public RenderFragment? CardContent { get; set; }
+
+	[Parameter]
+	public RenderFragment? CardActions { get; set; }
+
+	private string CreateHeaderClasses()
+		=> $"mud-theme-{ThemeColor.GetDescription()} justify-space-between";
+
+}

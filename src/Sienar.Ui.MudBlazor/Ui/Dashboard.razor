@@ -1,0 +1,64 @@
+﻿@inject AuthenticationStateProvider AuthState
+@inject IDashboardGenerator DashboardGenerator
+
+<H3 Class="mb-8">
+	@Name
+</H3>
+
+@foreach (var menuName in _menus.Keys)
+{
+	@if (!_menus[menuName].Any()) continue;
+
+	<H5>@menuName</H5>
+	<MudDivider Class="mt-1 mb-6"/>
+
+	<div class="d-flex flex-wrap">
+		@foreach (var menuItem in _menus[menuName])
+		{
+			@if (LinkTemplate is not null)
+			{
+				@LinkTemplate(menuItem)
+			}
+			else
+			{
+				<DashboardItem Item="menuItem"/>
+			}
+		}
+	</div>
+}
+
+@code {
+
+	private readonly Dictionary<string, List<DashboardLink>> _allMenus = new();
+	private Dictionary<string, List<DashboardLink>> _menus = new();
+
+	[Parameter]
+	public string Name { get; set; } = "Dashboard";
+
+	[Parameter]
+	public required List<string> Categories { get; set; }
+
+	[Parameter]
+	public RenderFragment<DashboardLink>? LinkTemplate { get; set; }
+
+	protected override void OnInitialized()
+	{
+		AuthState.AuthenticationStateChanged += UpdateMenuAndRender;
+		UpdateMenuAndRender(AuthState.GetAuthenticationStateAsync());
+	}
+
+	private async void UpdateMenuAndRender(Task<AuthenticationState> s)
+	{
+		await s;
+		_allMenus.Clear();
+		_menus.Clear();
+
+		foreach (var menuName in Categories)
+		{
+			_allMenus[menuName] = await DashboardGenerator.Create(menuName);
+		}
+
+		_menus = new(_allMenus);
+	}
+
+}

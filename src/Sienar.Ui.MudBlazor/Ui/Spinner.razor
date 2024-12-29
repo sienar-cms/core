@@ -1,0 +1,16 @@
+﻿<div class="mud-width-full d-flex justify-center mb-16">
+	<MudProgressCircular
+		Color="Color"
+		Size="Size"
+		Indeterminate/>
+</div>
+
+@code {
+
+	[Parameter]
+	public Color Color { get; set; } = Color.Primary;
+
+	[Parameter]
+	public Size Size { get; set; } = Size.Large;
+
+}

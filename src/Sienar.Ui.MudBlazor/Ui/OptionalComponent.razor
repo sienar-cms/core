@@ -1,0 +1,9 @@
+﻿@if (Type is not null)
+{
+	<DynamicComponent Type="Type"/>
+}
+
+@code {
+	[Parameter]
+    public Type? Type { get; set; }
+}

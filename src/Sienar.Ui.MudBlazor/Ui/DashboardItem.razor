@@ -1,0 +1,16 @@
+﻿<div class="dashboard-item d-flex flex-column align-center flex-shrink-0 mt-4">
+	<MudIcon
+		Class="mb-4"
+		Icon="@Item.Icon"
+		Size="Size.Large"/>
+	<MudLink Href="@Item.Url">
+		@Item.Text
+	</MudLink>
+</div>
+
+@code {
+
+	[Parameter]
+    public required DashboardLink Item { get; set; }
+
+}

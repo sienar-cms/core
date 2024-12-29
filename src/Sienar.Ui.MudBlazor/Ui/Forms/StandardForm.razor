@@ -1,0 +1,46 @@
+﻿@namespace Sienar.Ui
+@typeparam TFormModel
+@inherits BaseForm<TFormModel>
+
+<EditForm
+	Model="Model"
+	OnValidSubmit="HandleSubmit"
+	FormName="@FormName">
+	<DataAnnotationsValidator/>
+
+	<Card
+		Title="@Title"
+		ThemeColor="ThemeColor"
+		Square="Square"
+		Icon="@Icon"
+		IconTitle="@IconTitle">
+		<CardContent>
+			@Information
+
+			@Fields
+		</CardContent>
+
+		<CardActions>
+			@if (!HideSubmit)
+			{
+				<LoadingButton
+					Color="ThemeColor"
+					IsLoading="@(Loading || IsLoading)"
+					Class="mr-4">
+					@SubmitText
+				</LoadingButton>
+			}
+
+			@if (ShowReset)
+			{
+				<SecondaryButton
+					ButtonType="ButtonType.Reset"
+					OnClick="OnReset"
+					Class="mr-3">
+					@ResetText
+				</SecondaryButton>
+			}
+			@MoreActions
+		</CardActions>
+	</Card>
+</EditForm>

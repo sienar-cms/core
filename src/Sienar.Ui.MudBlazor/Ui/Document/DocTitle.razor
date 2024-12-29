@@ -1,0 +1,25 @@
+@using Sienar.Configuration
+@namespace Sienar.Ui
+@inject IOptions<SienarOptions> Options
+
+<PageTitle>
+	@GenerateTitle()
+</PageTitle>
+
+@code {
+
+	[Parameter]
+	public string? Title { get; set; }
+
+	[Parameter]
+	public string? Subtitle { get; set; }
+
+	private string GenerateTitle()
+	{
+		var subtitle = Subtitle ?? Options.Value.SiteName;
+		return string.IsNullOrEmpty(Title)
+			? subtitle
+			: $"{Title} | {subtitle}";
+	}
+
+}

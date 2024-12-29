@@ -1,0 +1,52 @@
+﻿<Card
+	Title="@Title"
+	ThemeColor="MainColor">
+	<CardContent>
+		<P>@Question</P>
+	</CardContent>
+
+	<CardActions>
+		<MudButton
+			Class="mr-4"
+			Color="MainColor"
+			Variant="Variant.Filled"
+			OnClick="Confirm">
+			@ConfirmText
+		</MudButton>
+		<MudButton
+			Color="CancelColor"
+			Variant="Variant.Outlined"
+			OnClick="Cancel">
+			@CancelText
+		</MudButton>
+	</CardActions>
+</Card>
+
+@code {
+
+	[CascadingParameter]
+	private MudDialogInstance Dialog { get; set; } = null!;
+
+	[Parameter]
+	public required string Title { get; set; }
+
+	[Parameter]
+    public required string Question { get; set; }
+
+	[Parameter]
+	public required string ConfirmText { get; set; }
+
+	[Parameter]
+	public required string CancelText { get; set; }
+
+	[Parameter]
+	public Color MainColor { get; set; } = Color.Primary;
+
+	[Parameter]
+	public Color CancelColor { get; set; } = Color.Secondary;
+
+	private void Confirm() => Dialog.Close(DialogResult.Ok(true));
+
+	private void Cancel() => Dialog.Cancel();
+
+}

@@ -1,0 +1,7 @@
+.dashboard-item {
+    width: 100px;
+}
+
+::deep a {
+    text-align: center;
+}

@@ -1,0 +1,49 @@
+@using System.Linq.Expressions
+@namespace Sienar.Ui
+@typeparam TItem
+
+<MudTh>
+	<MudTableSortLabel
+		SortBy="@For.Compile()"
+		SortLabel="@_sortLabel">
+		@if (ChildContent is not null)
+		{
+			@ChildContent
+		}
+		else
+		{
+			@_sortLabel
+		}
+	</MudTableSortLabel>
+</MudTh>
+
+@code {
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
+	[Parameter]
+	public required Expression<Func<TItem, object>> For { get; set; }
+
+	private string _sortLabel = string.Empty;
+
+	/// <inheritdoc />
+	protected override void OnInitialized()
+	{
+		var exception = new ArgumentException($"Expression {For.Body} does not return a property on {typeof(TItem)}");
+
+		var m = For.Body switch
+		{
+			MemberExpression member => member.Member,
+			UnaryExpression unary => (unary.Operand as MemberExpression)?.Member,
+			_ => throw exception
+		};
+		if (m is null)
+		{
+			throw exception;
+		}
+
+		_sortLabel = m.Name;
+	}
+
+}

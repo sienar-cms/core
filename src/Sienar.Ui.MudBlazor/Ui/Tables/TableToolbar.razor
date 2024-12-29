@@ -1,0 +1,54 @@
+﻿@namespace Sienar.Ui
+
+<H6>@Title</H6>
+<MudSpacer />
+
+@if (!HideSearch)
+{
+	<MudTextField
+		@bind-Value="Search"
+		Placeholder="Search"
+		Adornment="Adornment.Start"
+		AdornmentIcon="@Icons.Material.Filled.Search"
+		IconSize="Size.Medium"
+		Class="mt-0"
+		Immediate/>
+}
+
+@if (ChildContent != null)
+{
+	<div class="ml-5">
+		@ChildContent
+	</div>
+}
+
+@code {
+
+	private string _search = string.Empty;
+
+	[Parameter]
+	public string Search { get; set; } = string.Empty;
+
+	[Parameter]
+	public required string Title { get; set; }
+
+	[Parameter]
+	public EventCallback<string> SearchChanged { get; set; }
+
+	[Parameter]
+	public bool HideSearch { get; set; }
+
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
+	/// <inheritdoc />
+	protected override async Task OnParametersSetAsync()
+	{
+		if (_search != Search)
+		{
+			_search = Search;
+			await SearchChanged.InvokeAsync(_search);
+		}
+	}
+
+}
